@@ -18,6 +18,45 @@ var dirty=(function(){
 						}
 	fns.copy=fns.clone;
 
+
+fns.strings=function(){
+	return this.filter(function(v){
+		return typeof v=="string"
+	})
+}
+
+fns.numbers=function(){
+	return this.filter(function(v){
+		return typeof v=="object"
+	})
+}
+
+fns.objects=function(){
+	return this.filter(function(v){
+		return typeof v=="object"
+	})
+}
+
+fns.truthy=function(){
+	return this.filter(function(v){
+		return v
+	})
+}
+
+fns.duplicates=function(field) {
+	var arr=this;
+	if(field){arr=arr.grab(field);}
+	arr=arr.sort();
+	var results = [];
+	for (var i = 0; i < arr.length - 1; i++) {
+	    if (arr[i + 1] == arr[i]) {
+	        results.push(arr[i]);
+	    }
+	}
+	return results
+}
+
+
 fns.topk=function(verbose){
 	var myArray=this;
 	var newArray = [];
