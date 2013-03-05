@@ -56,6 +56,21 @@ fns.duplicates=function(field) {
 	return results
 }
 
+fns.overlap=function(arr2){
+  return this.filter(function(v){
+  	return arr2.some(function(v2){return v===v2})
+  })
+}
+fns.intersection=fns.overlap
+
+fns.has_overlap=function(arr2){
+  return this.some(function(v){
+  	return arr2.some(function(v2){return v===v2})
+  })
+}
+fns.overlaps=fns.has_overlap
+
+
 
 fns.topk=function(verbose){
 	var myArray=this;
@@ -380,3 +395,5 @@ Object.keys(fns).forEach(function(i){
 //  for(var i in r){
 //   console.log(i)
 //  }
+//r=[2,3,4,5]
+//r.overlap([3,4,88,8]).print()
