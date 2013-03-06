@@ -18,6 +18,91 @@ var dirty=(function(){
 						}
 	fns.copy=fns.clone;
 
+	//split an array into passes and fails
+	fns.spigot=function(fn){
+		var arr=this;
+		var all={"true":[],"false":[]}
+		arr.forEach(function(v){
+			if(fn(v)){
+				all["true"].push(v)
+			}else{
+				all["false"].push(v)
+			}
+		});
+		return all;
+	}
+	fns.moses=fns.spigot;
+
+fns.max=function(field){
+	if(field){
+		 return this.sort(function(a,b){return b[field]-[field]})[0]
+	}
+	 return Math.max.apply(null, this)
+}
+
+//an accuracy score
+fns.mean_average_precision=function(results){
+	var precisions=[];
+	var found=0;
+	this.forEach(function(w,i){
+	  i++
+	  if(w.isin(results)){
+	  	found++;
+	  }
+	  var precision=found/i;
+	  precisions.push(precision)
+	})
+	return precisions.average()
+}
+
+
+fns.recall=function(wanted){
+	var results=this;
+	if(wanted.length===0){return 0;}
+	var overlap=results.overlap(wanted).length;
+	return overlap/wanted.length
+}
+
+fns.precision=function(wanted){
+	var results=this;
+	if(results.length===0){return 0;}
+	var overlap=results.overlap(wanted).length;
+	return overlap/results.length
+}
+
+//add em up
+fns.sum=function(field){
+	if(field){
+		return this.reduce(function(a, b) {
+	    return a + b[field];
+		},0);
+	}
+	return this.reduce(function(a, b) {
+	    return a + b;
+	},0);
+}
+
+// % of array that pass a test
+fns.percentage=function(fn){
+	var passes=this.filter(fn);
+	return parseInt((passes.length/this.length)*100)
+}
+
+fns.average=function(field){
+	var sum=0
+	if(field){
+		sum= this.reduce(function(a, b) {
+	    return a + b[field];
+		},0);
+	}else{
+		sum= this.reduce(function(a, b) {
+	    return a + b;
+		},0);
+	}
+	return sum/this.length
+}
+fns.mean=fns.average;
+
 
 fns.strings=function(){
 	return this.filter(function(v){
@@ -62,6 +147,14 @@ fns.overlap=function(arr2){
   })
 }
 fns.intersection=fns.overlap
+
+//arr minus
+fns.missing_from=function(arr2){
+  return this.filter(function(v){
+  	return !arr2.some(function(v2){return v===v2})
+  })
+}
+
 
 fns.has_overlap=function(arr2){
   return this.some(function(v){
@@ -222,7 +315,10 @@ fns.toobject = function(values) {
 	}
   fns.top=fns.first;
 
-
+	fns.head=function(max){
+		max=max||10;
+		return fns.first(max)
+	}
 
 	//add them to the prototype
 	Object.keys(fns).forEach(function(i){
@@ -238,10 +334,12 @@ fns.toobject = function(values) {
 
 
 String.prototype.isin=function(arr){
-		return arr.some(function(v){return this==word})
+	var word=this;
+	return arr.some(function(v){return word==v})
 }
 Number.prototype.isin=function(arr){
-		return arr.some(function(v){return this==word})
+	var word=this;
+	return arr.some(function(v){return word==v})
 }
 
 Number.prototype.to=function(stop, step) {
@@ -395,5 +493,20 @@ Object.keys(fns).forEach(function(i){
 //  for(var i in r){
 //   console.log(i)
 //  }
-//r=[2,3,4,5]
+r=[2,3,4,5]
 //r.overlap([3,4,88,8]).print()
+//r.spigot(function(v){return v>3}).print()
+	 r=[{f:3},{f:2},{f:9}]
+	// var d=[1,2,4]
+
+ // r.spigot(function(v){return v.f.isin(d)}).print()
+ //r.sum('f').print()
+ //r.average('f').print()
+
+// r.percentage(function(s){return s.f>2}).print()
+
+
+var results=["dan","tom","spencer"]
+var wanted=["dan","spencer","john","frank","bill","sam"]
+// results.mean_average_precision(wanted).print()
+// results.recall(wanted).print()
