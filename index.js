@@ -1,478 +1,549 @@
 //make a mess
 
-var dirty=(function(){
-	var dirty={};
+var dirty = (function() {
+	var dirty = {};
 
-	var fns={}
+	var fns = {arr:{}, obj:{}, number:{}, string:{}}
 
-	fns.grab=function(p){
-							return this.map(function(s){
-								return s[p]
-							})
-						}
-	fns.collect=fns.grab;
+	fns.arr.grab = function(p) {
+		return this.map(function(s) {
+			return s[p]
+		})
+	}
+	fns.arr.collect = fns.arr.grab;
 
 
-	fns.clone=function(){
-							return JSON.parse(JSON.stringify(this))
-						}
-	fns.copy=fns.clone;
+	fns.arr.clone = function() {
+		return JSON.parse(JSON.stringify(this))
+	}
+	fns.arr.copy = fns.arr.clone;
 
 	//split an array into passes and fails
-	fns.spigot=function(fn){
-		var arr=this;
-		var all={"true":[],"false":[]}
-		arr.forEach(function(v){
-			if(fn(v)){
+	fns.arr.spigot = function(fn) {
+		var arr = this;
+		var all = {
+			"true": [],
+			"false": []
+		}
+		arr.forEach(function(v) {
+			if (fn(v)) {
 				all["true"].push(v)
-			}else{
+			} else {
 				all["false"].push(v)
 			}
 		});
 		return all;
 	}
-	fns.moses=fns.spigot;
+	fns.arr.moses = fns.arr.spigot;
 
-fns.max=function(field){
-	if(field){
-		 return this.sort(function(a,b){return b[field]-[field]})[0]
+	fns.arr.max = function(field) {
+		if (field) {
+			return this.sort(function(a, b) {
+				return b[field] - [field]
+			})[0]
+		}
+		return Math.max.apply(null, this)
 	}
-	 return Math.max.apply(null, this)
-}
 
-//an accuracy score
-fns.mean_average_precision=function(results){
-	var precisions=[];
-	var found=0;
-	this.forEach(function(w,i){
-	  i++
-	  if(w.isin(results)){
-	  	found++;
-	  }
-	  var precision=found/i;
-	  precisions.push(precision)
-	})
-	return precisions.average()
-}
-
-
-fns.recall=function(wanted){
-	var results=this;
-	if(wanted.length===0){return 0;}
-	var overlap=results.overlap(wanted).length;
-	return overlap/wanted.length
-}
-
-fns.precision=function(wanted){
-	var results=this;
-	if(results.length===0){return 0;}
-	var overlap=results.overlap(wanted).length;
-	return overlap/results.length
-}
-
-//add em up
-fns.sum=function(field){
-	if(field){
-		return this.reduce(function(a, b) {
-	    return a + b[field];
-		},0);
-	}
-	return this.reduce(function(a, b) {
-	    return a + b;
-	},0);
-}
-
-// % of array that pass a test
-fns.percentage=function(fn){
-	var passes=this.filter(fn);
-	return parseInt((passes.length/this.length)*100)
-}
-
-fns.average=function(field){
-	var sum=0
-	if(field){
-		sum= this.reduce(function(a, b) {
-	    return a + b[field];
-		},0);
-	}else{
-		sum= this.reduce(function(a, b) {
-	    return a + b;
-		},0);
-	}
-	return sum/this.length
-}
-fns.mean=fns.average;
-
-
-fns.strings=function(){
-	return this.filter(function(v){
-		return typeof v=="string"
-	})
-}
-
-fns.numbers=function(){
-	return this.filter(function(v){
-		return typeof v=="object"
-	})
-}
-
-fns.objects=function(){
-	return this.filter(function(v){
-		return typeof v=="object"
-	})
-}
-
-fns.truthy=function(){
-	return this.filter(function(v){
-		return v
-	})
-}
-
-fns.duplicates=function(field) {
-	var arr=this;
-	if(field){arr=arr.grab(field);}
-	arr=arr.sort();
-	var results = [];
-	for (var i = 0; i < arr.length - 1; i++) {
-	    if (arr[i + 1] == arr[i]) {
-	        results.push(arr[i]);
-	    }
-	}
-	return results
-}
-
-fns.overlap=function(arr2){
-  return this.filter(function(v){
-  	return arr2.some(function(v2){return v===v2})
-  })
-}
-fns.intersection=fns.overlap
-
-//arr minus
-fns.missing_from=function(arr2){
-  return this.filter(function(v){
-  	return !arr2.some(function(v2){return v===v2})
-  })
-}
-
-
-fns.has_overlap=function(arr2){
-  return this.some(function(v){
-  	return arr2.some(function(v2){return v===v2})
-  })
-}
-fns.overlaps=fns.has_overlap
-
-
-
-fns.topk=function(verbose){
-	var myArray=this;
-	var newArray = [];
-	var length=myArray.length ||1
-	var freq = {};
-	//Count Frequency of Occurances
-	var i=myArray.length-1;
-	for (var i;i>-1;i--)
-	{
-	  var value = myArray[i];
-	  freq[value]==null?freq[value]=1:freq[value]++;
-	}
-	//convert to sortable array
-	for (var value in freq)
-	{
-	  newArray.push(value);
-	}
-	newArray=newArray.sort(function(a,b){return freq[b]-freq[a];}).map(function(v){
-		return {value:v, count:freq[v], percentage: ((freq[v]/length)*100).toFixed(2)}
-	});
-	if(verbose){
-		return newArray
-	}else{
-		return newArray.map(function(s){return s.value})
-	}
-}
-fns.freq=fns.topk
-fns.frequency=fns.topk
-
-	fns.each=function(fn){
-						 this.forEach(fn)
-						}
-	fns.loop=fns.each;
-
-//nulls or undefined
-	fns.uniq=function(field){
-			 	 var x=this;
-			 	 if(!field){
-				   var newArray=new Array();
-				    label:for(var i=0; i<x.length;i++ ){
-				      for(var j=0; j<newArray.length;j++ ){ 
-				          if(newArray[j]==x[i]) 
-				          continue label;
-				        }
-				        newArray[newArray.length] = x[i];
-				      }
-				    return newArray;
-				  }else{
-				   var newArray=new Array();
-				    label:for(var i=0; i<x.length;i++ ){
-				      for(var j=0; j<newArray.length;j++ ){ 
-				          if(newArray[j][field]==x[i][field]) 
-				          continue label;
-				        }
-				        newArray[newArray.length] = x[i];
-				      }
-				    return newArray;
-			  	}
-			  }
-	fns.unique=fns.uniq
-	fns.uniq_by=fns.uniq
-	fns.unique_by=fns.uniq
-
-		//remove nulls
-	fns.compact=function(){
-					return this.filter(function(v){return v===0||v})
-				}
-
-		//remove nested arrays one step
-	fns.flatten=function(){
-					    var flat = [];
-					    var array=this;
-					    for (var i = 0, l = array.length; i < l; i++){
-					        var type = Object.prototype.toString.call(array[i]).split(' ').pop().split(']').shift().toLowerCase();
-					        if (type) { flat = flat.concat(/^(array|collection|arguments|object)$/.test(type) ? Array.prototype.flatten(array[i]) : array[i]); }
-					    }
-					    return flat;
-					}
-
-		//pretty-print
-	fns.print=function(){
-				console.log(JSON.stringify(this, null, 2));
+	//an accuracy score
+	fns.arr.mean_average_precision = function(results) {
+		if(results.length===0 && this.length===0){return 1}
+		var precisions = [];
+		var found = 0;
+		this.forEach(function(w, i) {
+			i++
+			if (results.some(function(s){return s==w})) {
+			// if (w.isin(results)) {
+				found++;
 			}
-	fns.printf=fns.print
-	fns.console=fns.print
-	fns.log=fns.print
-
-
-	fns.shuffle=function(){
-		return this.sort(function(a,b){return (Math.round(Math.random())-0.5);})
+			var precision = found / i;
+			precisions.push(precision)
+		})
+		return precisions.average()
 	}
-	fns.randomize=fns.shuffle;
-
-
-fns.group_by=function(str){
-  var obj={}
-  this.forEach(function(t){
-    if(!obj[t[str]]){
-      obj[t[str]]=[t]
-    }else{
-      obj[t[str]].push(t)
-    }
-  })
-  return obj
-}
 
 
 
+	fns.arr.recall = function(wanted) {
+		var results = this;
+		if (wanted.length === 0) {
+			return 0;
+		}
+		var overlap = results.overlap(wanted).length;
+		return overlap / wanted.length
+	}
 
-fns.chunk_by=function(group_length){
-	var all=[]
-	var arr=this;
-	group_length=group_length||1;
-	for(var i in arr){
-		if(i%group_length==0){
-			all.push([arr[i]])
-		}else{
-			all[all.length-1].push(arr[i])
+	fns.arr.precision = function(wanted) {
+		var results = this;
+		if (results.length === 0) {
+			return 0;
+		}
+		var overlap = results.overlap(wanted).length;
+		return overlap / results.length
+	}
+
+	//add em up
+	fns.arr.sum = function(field) {
+		if (field) {
+			return this.reduce(function(a, b) {
+				return a + b[field];
+			}, 0);
+		}
+		return this.reduce(function(a, b) {
+			return a + b;
+		}, 0);
+	}
+
+	// % of array that pass a test
+	fns.arr.percentage = function(fn) {
+		var passes = this.filter(fn);
+		return parseInt((passes.length / this.length) * 100)
+	}
+
+	fns.arr.average = function(field) {
+		if(this.length===0){return 0;}
+		var sum = 0
+		if (field) {
+			sum = this.reduce(function(a, b) {
+				return a + b[field];
+			}, 0);
+		} else {
+			sum = this.reduce(function(a, b) {
+				return a + b;
+			}, 0);
+		}
+		return sum / this.length
+	}
+	fns.arr.mean = fns.arr.average;
+
+
+	fns.arr.strings = function() {
+		return this.filter(function(v) {
+			return typeof v == "string"
+		})
+	}
+
+	fns.arr.numbers = function() {
+		return this.filter(function(v) {
+			return typeof v == "object"
+		})
+	}
+
+	fns.arr.objects = function() {
+		return this.filter(function(v) {
+			return typeof v == "object"
+		})
+	}
+
+	fns.arr.truthy = function() {
+		return this.filter(function(v) {
+			return v
+		})
+	}
+
+	fns.arr.duplicates = function(field) {
+		var arr = this;
+		if (field) {
+			arr = arr.grab(field);
+		}
+		arr = arr.sort();
+		var results = [];
+		for (var i = 0; i < arr.length - 1; i++) {
+			if (arr[i + 1] == arr[i]) {
+				results.push(arr[i]);
+			}
+		}
+		return results
+	}
+
+	fns.arr.overlap = function(arr2) {
+		return this.filter(function(v) {
+			return arr2.some(function(v2) {
+				return v === v2
+			})
+		})
+	}
+	fns.arr.intersection = fns.arr.overlap
+
+	//arr minus
+	fns.arr.missing_from = function(arr2) {
+		return this.filter(function(v) {
+			return !arr2.some(function(v2) {
+				return v === v2
+			})
+		})
+	}
+
+
+	fns.arr.has_overlap = function(arr2) {
+		return this.some(function(v) {
+			return arr2.some(function(v2) {
+				return v === v2
+			})
+		})
+	}
+	fns.arr.overlaps = fns.arr.has_overlap
+
+
+	fns.arr.topk = function(verbose) {
+		var myArray = this;
+		var newArray = [];
+		var length = myArray.length || 1
+		var freq = {};
+		//Count Frequency of Occurances
+		var i = myArray.length - 1;
+		for (var i; i > -1; i--) {
+			var value = myArray[i];
+			freq[value] == null ? freq[value] = 1 : freq[value]++;
+		}
+		//convert to sortable array
+		for (var value in freq) {
+			newArray.push(value);
+		}
+		newArray = newArray.sort(function(a, b) {
+			return freq[b] - freq[a];
+		}).map(function(v) {
+			return {
+				value: v,
+				count: freq[v],
+				percentage: ((freq[v] / length) * 100).toFixed(2)
+			}
+		});
+		if (verbose) {
+			return newArray
+		} else {
+			return newArray.map(function(s) {
+				return s.value
+			})
 		}
 	}
-	return all
-  }
+	fns.arr.freq = fns.arr.topk
+	fns.arr.frequency = fns.arr.topk
 
-
-fns.toobject = function(values) {
-		var list=this;
-    if (list == null) return {};
-    var result = {};
-    for (var i = 0, l = list.length; i < l; i++) {
-      if (values) {
-        result[list[i]] = values[i];
-      } else {
-        result[list[i][0]] = list[i][1];
-      }
-    }
-    return result;
-  };
-
-	fns.spotcheck=function(max){
-		max=max||10
-		this=this.randomize();
-		return this.slice(0,max);
+	fns.arr.each = function(fn) {
+		this.forEach(fn)
 	}
+	fns.arr.loop = fns.arr.each;
 
-	fns.first=function(max){
-		max=max||1
-		return this.slice(0,max);
-	}
-  fns.top=fns.first;
-
-	fns.head=function(max){
-		max=max||10;
-		return fns.first(max)
-	}
-
-	//add them to the prototype
-	Object.keys(fns).forEach(function(i){
-		Object.defineProperty(Array.prototype, i, {
-			value: fns[i],
-			configurable: true,
-		  enumerable: false
-		});
-	})
-
-
-
-
-
-String.prototype.isin=function(arr){
-	var word=this;
-	return arr.some(function(v){return word==v})
-}
-Number.prototype.isin=function(arr){
-	var word=this;
-	return arr.some(function(v){return word==v})
-}
-
-Number.prototype.to=function(stop, step) {
-		var start=this;
-    if (stop==null||stop==undefined||stop==start) {
-      return []
-    }
-    step=step||1;
-    var arr=[];
-    if(stop>start){//go forwards
-    	for(var i=start;i<=stop;i+=step){
-    		arr.push(i)
-    	}
-    }else{//go backwards
-			for(var i=start;i>=stop;i-=step){
-    		arr.push(i)
-    	}
-    }
-    return arr;
-  };
-
-// x=3
-// x.to(-700).print()
-//////////
-
-var fns={};
-
-fns.values=function(){
-				var obj=this;
-				return Object.keys(this).map(function(v){return obj[v]})
-			}
-fns.keys=function(){
-				return Object.keys(this)
-			}
-fns.map=function(fn){
-				var obj=this;
-				return Object.keys(this).map(function(v){
-					return fn(obj[v],v)
-				})
-			}
-fns.each=function(fn){
-	var obj=this;
-	Object.keys(this).map(function(v){
-		return fn(obj[v],v)
-	})
-}
-fns.toarr=function(){
-				var arr=[]
-				for(var i in this){
-					arr.push([i, this[i]])
+	//nulls or undefined
+	fns.arr.uniq = function(field) {
+		var x = this;
+		if (!field) {
+			var newArray = new Array();
+			label: for (var i = 0; i < x.length; i++) {
+				for (var j = 0; j < newArray.length; j++) {
+					if (newArray[j] == x[i]) continue label;
 				}
-				return arr
+				newArray[newArray.length] = x[i];
 			}
-fns.size=function(){
-    var size = 0, key;
-    for (key in this) {
-        if(this.hasOwnProperty(key)){size+=1;}
-    }
-    return size;
+			return newArray;
+		} else {
+			var newArray = new Array();
+			label: for (var i = 0; i < x.length; i++) {
+				for (var j = 0; j < newArray.length; j++) {
+					if (newArray[j][field] == x[i][field]) continue label;
+				}
+				newArray[newArray.length] = x[i];
+			}
+			return newArray;
+		}
+	}
+	fns.arr.unique = fns.arr.uniq
+	fns.arr.uniq_by = fns.arr.uniq
+	fns.arr.unique_by = fns.arr.uniq
+
+	//remove nulls
+	fns.arr.compact = function() {
+		return this.filter(function(v) {
+			return v === 0 || v
+		})
+	}
+
+	//remove nested arrays one step
+	fns.arr.flatten = function() {
+		var flat = [];
+		var array = this;
+		for (var i = 0, l = array.length; i < l; i++) {
+			var type = Object.prototype.toString.call(array[i]).split(' ').pop().split(']').shift().toLowerCase();
+			if (type) {
+				flat = flat.concat(/^(array|collection|arguments|object)$/.test(type) ? Array.prototype.flatten(array[i]) : array[i]);
+			}
+		}
+		return flat;
+	}
+
+	//pretty-print
+	fns.arr.print = function() {
+		console.log(JSON.stringify(this, null, 2));
+	}
+	fns.arr.printf = fns.arr.print
+	fns.arr.console = fns.arr.print
+	fns.arr.log = fns.arr.print
+
+
+	fns.arr.shuffle = function() {
+		return this.sort(function(a, b) {
+			return (Math.round(Math.random()) - 0.5);
+		})
+	}
+	fns.arr.randomize = fns.arr.shuffle;
+
+
+	fns.arr.group_by = function(str) {
+		var obj = {}
+		this.forEach(function(t) {
+			if (!obj[t[str]]) {
+				obj[t[str]] = [t]
+			} else {
+				obj[t[str]].push(t)
+			}
+		})
+		return obj
+	}
+
+
+	fns.arr.chunk_by = function(group_length) {
+		var all = []
+		var arr = this;
+		group_length = group_length || 1;
+		for (var i in arr) {
+			if (i % group_length == 0) {
+				all.push([arr[i]])
+			} else {
+				all[all.length - 1].push(arr[i])
+			}
+		}
+		return all
+	}
+
+
+	fns.arr.toobject = function(values) {
+		var list = this;
+		if (list == null) return {};
+		var result = {};
+		for (var i = 0, l = list.length; i < l; i++) {
+			if (values) {
+				result[list[i]] = values[i];
+			} else {
+				result[list[i][0]] = list[i][1];
+			}
+		}
+		return result;
 	};
-fns.filter=function(fn){
-		var obj=this;
-		var arr= Object.keys(this).filter(function(v){
+
+	fns.arr.spotcheck = function(max) {
+		max = max || 10
+		this = this.randomize();
+		return this.slice(0, max);
+	}
+
+	fns.arr.first = function(max) {
+		max = max || 1
+		return this.slice(0, max);
+	}
+	fns.arr.top = fns.arr.first;
+
+	fns.arr.head = function(max) {
+		max = max || 10;
+		return fns.arr.first(max)
+	}
+
+
+	//////////
+	fns.obj.values = function() {
+		var obj = this;
+		return Object.keys(this).map(function(v) {
+			return obj[v]
+		})
+	}
+	fns.obj.keys = function() {
+		return Object.keys(this)
+	}
+	fns.obj.map = function(fn) {
+		var obj = this;
+		return Object.keys(this).map(function(v) {
+			return fn(obj[v], v)
+		})
+	}
+	fns.obj.each = function(fn) {
+		var obj = this;
+		Object.keys(this).map(function(v) {
+			return fn(obj[v], v)
+		})
+	}
+	fns.obj.toarr = function() {
+		var arr = []
+		for (var i in this) {
+			arr.push([i, this[i]])
+		}
+		return arr
+	}
+	fns.obj.size = function() {
+		var size = 0,
+			key;
+		for (key in this) {
+			if (this.hasOwnProperty(key)) {
+				size += 1;
+			}
+		}
+		return size;
+	};
+	fns.obj.filter = function(fn) {
+		var obj = this;
+		var arr = Object.keys(this).filter(function(v) {
 			return fn(obj[v], v);
 		})
-		var newobj={}
-		arr.forEach(function(a){
-			newobj[a]=obj[a]
+		var newobj = {}
+		arr.forEach(function(a) {
+			newobj[a] = obj[a]
 		});
 		return newobj
-}
-fns.extend=function(obj) {
-    for(var i in obj){
-    	this[i]=obj[i];
-    }
-    return obj;
-  };
-
-fns.print=function(){
-			console.log(JSON.stringify(this, null, 2));
+	}
+	fns.obj.extend = function(obj) {
+		for (var i in obj) {
+			this[i] = obj[i];
 		}
-fns.printf=fns.print
-fns.log=fns.print
+		return obj;
+	};
+	fns.obj.combine = fns.obj.extend;
+	fns.obj.add = fns.obj.extend;
 
-fns.combine=fns.extend;
-fns.add=fns.extend;
+	fns.obj.print = function() {
+		console.log(JSON.stringify(this, null, 2));
+	}
+	fns.obj.printf = fns.obj.print
+	fns.obj.log = fns.obj.print
 
-/*
-	fns.grab=function(str){
+
+	/*
+	fns.obj.grab=function(str){
 		  var obj=this;
 			return Object.keys(this).map(function(k){
 				return obj[str]
 			})
 		}
-	fns.collect=fns.grab;*/
+	fns.obj.collect=fns.obj.grab;*/
 
 
-Object.keys(fns).forEach(function(i){
-	Object.defineProperty(Object.prototype, i, {
-		value: fns[i],
-		configurable: true,
-	  enumerable: false
-	});
-})
+///////
+//add them to the prototype
+////////
+
+	Object.keys(fns.arr).forEach(function(i) {
+		Object.defineProperty(Array.prototype, i, {
+			value: fns.arr[i],
+			configurable: true,
+			enumerable: false
+		});
+	})
+
+	String.prototype.isin = function(arr) {
+		var word = this;
+		return arr.some(function(v) {
+			return word == v
+		})
+	}
+	Number.prototype.isin = function(arr) {
+		var word = this;
+		return arr.some(function(v) {
+			return word == v
+		})
+	}
+
+	Number.prototype.to = function(stop, step) {
+		var start = this;
+		if (stop == null || stop == undefined || stop == start) {
+			return []
+		}
+		step = step || 1;
+		var arr = [];
+		if (stop > start) { //go forwards
+			for (var i = start; i <= stop; i += step) {
+				arr.push(i)
+			}
+		} else { //go backwards
+			for (var i = start; i >= stop; i -= step) {
+				arr.push(i)
+			}
+		}
+		return arr;
+	};
 
 
 
+//write object ones
+	Object.keys(fns.obj).forEach(function(i) {
+		Object.defineProperty(Object.prototype, i, {
+			value: fns.obj[i],
+			configurable: true,
+			enumerable: false
+		});
+	})
 
-	//repair the array prototype
-	dirty.undo=function(){
-		Object.keys(fns).forEach(function(i){
+//write array ones
+	Object.keys(fns.arr).forEach(function(i) {
+		Object.defineProperty(Array.prototype, i, {
+			value: fns.arr[i],
+			configurable: true,
+			enumerable: false
+		});
+	})
+
+
+	//repair the prototype
+	dirty.undo = function() {
+		Object.keys(fns).forEach(function(i) {
 			Object.defineProperty(Array.prototype, i, {
-			    value: undefined
+				value: undefined
 			});
 		})
 	}
-	dirty.fix=dirty.undo;
-	dirty.clean=dirty.undo;
-	dirty.cleanup=dirty.undo;
+	dirty.fix = dirty.undo;
+	dirty.clean = dirty.undo;
+	dirty.cleanup = dirty.undo;
 
-//export the module
-    // AMD / RequireJS
-    if (typeof define !== 'undefined' && define.amd) {
-        define([], function () {
-            return dirty;
-        });
-    }
-    // Node.js
-    else if (typeof module !== 'undefined' && module.exports) {
-        module.exports = dirty;
-    }
+	//export the module
+	// AMD / RequireJS
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return dirty;
+		});
+	}
+	// Node.js
+	else if (typeof module !== 'undefined' && module.exports) {
+		module.exports = dirty;
+	}
 
-    return dirty;
+	
+
+
+	function documentation(){
+		var arr=[];
+		arr.push('===Object methods===')
+		Object.keys(fns.arr).forEach(function(v){
+			arr.push('* __obj.'+v+'__ ( ) ')
+		})		
+		arr.push('')
+		arr.push('===Array methods===')
+		Object.keys(fns.arr).forEach(function(v){
+			arr.push('* __arr.'+v+'__ ( )')
+		})		
+		arr.push('')
+		arr.push('===Number methods===')
+		Object.keys(fns.arr).forEach(function(v){
+			arr.push('* __x.'+v+'__ ( )')
+		})
+		arr.push('')
+		arr.push('===String methods===')
+		Object.keys(fns.arr).forEach(function(v){
+			arr.push('* __str.'+v+'__ ( )')
+		})
+		return arr.join('\n')
+	}
+console.log(documentation())
+
+return dirty;
+
 
 })()
 
@@ -493,20 +564,20 @@ Object.keys(fns).forEach(function(i){
 //  for(var i in r){
 //   console.log(i)
 //  }
-r=[2,3,4,5]
+//r=[2,3,4,5]
 //r.overlap([3,4,88,8]).print()
 //r.spigot(function(v){return v>3}).print()
-	 r=[{f:3},{f:2},{f:9}]
-	// var d=[1,2,4]
+//	 r=[{f:3},{f:2},{f:9}]
+// var d=[1,2,4]
 
- // r.spigot(function(v){return v.f.isin(d)}).print()
- //r.sum('f').print()
- //r.average('f').print()
+// r.spigot(function(v){return v.f.isin(d)}).print()
+//r.sum('f').print()
+//r.average('f').print()
 
 // r.percentage(function(s){return s.f>2}).print()
 
 
-var results=["dan","tom","spencer"]
-var wanted=["dan","spencer","john","frank","bill","sam"]
-// results.mean_average_precision(wanted).print()
-// results.recall(wanted).print()
+// var results=["dan","tom","spencer",null]
+// var wanted=["dan","spencer","john",null,"frank","bill","sam"]
+//  results.mean_average_precision(wanted).print()
+// // results.recall(wanted).print()
