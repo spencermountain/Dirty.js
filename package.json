@@ -1,19 +1,14 @@
 {
   "author": "Spencer Kelly <spencerwater@gmail.com> (http://spencerwaterbed.com)",
   "name": "dirty",
-  "description": "recklessly create bugs by modifying the ",
-  "version": "2.1.7",
+  "description": "do questionable things to the javascript built-in methods",
+  "version": "2.1.8",
   "repository": {
     "type": "git",
-    "url": "git://github.com/spencermountain/Freebase-nodejs.git"
+    "url": "https://github.com/spencermountain/Dirty.js"
   },
-  "main": "freebase.js",
+  "main": "index.js",
   "engines" : ["node >= 0.3.6"],
-  "bin":{"freebase": "./lib/bin.js"},
   "dependencies": {
-    "request": "2.12.0",
-    "async": "0.2.3",
-    "underscore": "1.4.2"
-  },
-  "preferGlobal": true
+  }
 }

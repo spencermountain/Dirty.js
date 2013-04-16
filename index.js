@@ -3,15 +3,21 @@
 var dirty = (function() {
 	var dirty = {};
 
-	var fns = {arr:{}, obj:{}, number:{}, string:{}}
+	var fns = {arr:{}, obj:{}, num:{}, str:{}}
 
 	fns.arr.grab = function(p) {
+		//array of fields to return
+		if(typeof p=="object" && p.length){
+			return this.map(function(s) {
+				return p.map(function(f){return s[f]})
+			})
+		}
 		return this.map(function(s) {
 			return s[p]
 		})
 	}
 	fns.arr.collect = fns.arr.grab;
-
+	fns.arr.transform = fns.arr.grab;
 
 	fns.arr.clone = function() {
 		return JSON.parse(JSON.stringify(this))
@@ -100,6 +106,22 @@ var dirty = (function() {
 		return parseInt((passes.length / this.length) * 100)
 	}
 
+	fns.arr.select=Array.prototype.filter;
+	fns.arr.must=fns.arr.select;
+
+	fns.arr.reject = function(filter) {
+		if(typeof filter=="function"){
+			return this.filter(function(v){return !filter(v)})
+		}else if(typeof filter=="number" || typeof filter=="string"){
+			return this.filter(function(v){return v!=filter})
+		}else if(typeof filter=="object"){
+			filter=JSON.stringify(filter)
+			return this.filter(function(v){return JSON.stringify(v)!=filter})
+		}
+	}
+	fns.arr.kill = fns.arr.reject
+	fns.arr.remove = fns.arr.reject
+
 	fns.arr.average = function(field) {
 		if(this.length===0){return 0;}
 		var sum = 0
@@ -155,6 +177,7 @@ var dirty = (function() {
 		}
 		return results
 	}
+	fns.arr.dupes=fns.arr.duplicates;
 
 	fns.arr.overlap = function(arr2) {
 		return this.filter(function(v) {
@@ -164,6 +187,8 @@ var dirty = (function() {
 		})
 	}
 	fns.arr.intersection = fns.arr.overlap
+	fns.arr.isin = fns.arr.overlap
+	fns.arr.just = fns.arr.overlap
 
 	//arr minus
 	fns.arr.missing_from = function(arr2) {
@@ -261,15 +286,9 @@ var dirty = (function() {
 
 	//remove nested arrays one step
 	fns.arr.flatten = function() {
-		var flat = [];
-		var array = this;
-		for (var i = 0, l = array.length; i < l; i++) {
-			var type = Object.prototype.toString.call(array[i]).split(' ').pop().split(']').shift().toLowerCase();
-			if (type) {
-				flat = flat.concat(/^(array|collection|arguments|object)$/.test(type) ? Array.prototype.flatten(array[i]) : array[i]);
-			}
-		}
-		return flat;
+		return this.reduce(function(a, b) {
+		    return a.concat(b);
+		},[]);
 	}
 
 	//pretty-print
@@ -337,11 +356,28 @@ var dirty = (function() {
 		return this.slice(0, max);
 	}
 
-	fns.arr.first = function(max) {
-		max = max || 1
-		return this.slice(0, max);
+	fns.arr.first = function(filt) {
+		filt = filt || 1
+		if(typeof filt=="function"){
+			var match;
+			this.some(function(v){
+				if(filt(v)){
+					match=v
+					return true
+				}else{
+					return false
+				}
+			})
+			return match;
+		}else	if(typeof filt=="number"){
+		  return this.slice(0, filt);
+		}
 	}
 	fns.arr.top = fns.arr.first;
+
+	fns.arr.last=function(){
+		return this[this.length-1]
+	}
 
 	fns.arr.head = function(max) {
 		max = max || 10;
@@ -378,6 +414,9 @@ var dirty = (function() {
 		}
 		return arr
 	}
+	fns.obj.to_arr=fns.obj.toarr
+	fns.obj.to_a=fns.obj.toarr
+
 	fns.obj.size = function() {
 		var size = 0,
 			key;
@@ -425,32 +464,15 @@ var dirty = (function() {
 	fns.obj.collect=fns.obj.grab;*/
 
 
-///////
-//add them to the prototype
-////////
 
-	Object.keys(fns.arr).forEach(function(i) {
-		Object.defineProperty(Array.prototype, i, {
-			value: fns.arr[i],
-			configurable: true,
-			enumerable: false
-		});
-	})
-
-	String.prototype.isin = function(arr) {
-		var word = this;
-		return arr.some(function(v) {
-			return word == v
-		})
-	}
-	Number.prototype.isin = function(arr) {
+fns.str.isin=function(arr) {
 		var word = this;
 		return arr.some(function(v) {
 			return word == v
 		})
 	}
 
-	Number.prototype.to = function(stop, step) {
+fns.num.to=function(stop, step) {
 		var start = this;
 		if (stop == null || stop == undefined || stop == start) {
 			return []
@@ -468,7 +490,11 @@ var dirty = (function() {
 		}
 		return arr;
 	};
+fns.num.upto=fns.num.to
 
+///////
+//add them to the prototype
+////////
 
 
 //write object ones
@@ -484,6 +510,24 @@ var dirty = (function() {
 	Object.keys(fns.arr).forEach(function(i) {
 		Object.defineProperty(Array.prototype, i, {
 			value: fns.arr[i],
+			configurable: true,
+			enumerable: false
+		});
+	})
+
+//write string ones
+	Object.keys(fns.str).forEach(function(i) {
+		Object.defineProperty(String.prototype, i, {
+			value: fns.str[i],
+			configurable: true,
+			enumerable: false
+		});
+	})
+
+	//write number ones
+	Object.keys(fns.num).forEach(function(i) {
+		Object.defineProperty(Number.prototype, i, {
+			value: fns.num[i],
 			configurable: true,
 			enumerable: false
 		});
@@ -514,33 +558,33 @@ var dirty = (function() {
 		module.exports = dirty;
 	}
 
-	
+
 
 
 	function documentation(){
 		var arr=[];
-		arr.push('===Object methods===')
-		Object.keys(fns.arr).forEach(function(v){
-			arr.push('* __obj.'+v+'__ ( ) ')
-		})		
+		arr.push('##Object methods')
+		Object.keys(fns.obj).forEach(function(v){
+			arr.push('* __.'+v+'__ ( ) ')
+		})
 		arr.push('')
-		arr.push('===Array methods===')
+		arr.push('##Array methods')
 		Object.keys(fns.arr).forEach(function(v){
-			arr.push('* __arr.'+v+'__ ( )')
-		})		
+			arr.push('* __.'+v+'__ ( )')
+		})
 		arr.push('')
-		arr.push('===Number methods===')
-		Object.keys(fns.arr).forEach(function(v){
+		arr.push('##Number methods')
+		Object.keys(fns.num).forEach(function(v){
 			arr.push('* __x.'+v+'__ ( )')
 		})
 		arr.push('')
-		arr.push('===String methods===')
-		Object.keys(fns.arr).forEach(function(v){
+		arr.push('##String methods')
+		Object.keys(fns.str).forEach(function(v){
 			arr.push('* __str.'+v+'__ ( )')
 		})
 		return arr.join('\n')
 	}
-console.log(documentation())
+//console.log(documentation())
 
 return dirty;
 
@@ -581,3 +625,6 @@ return dirty;
 // var wanted=["dan","spencer","john",null,"frank","bill","sam"]
 //  results.mean_average_precision(wanted).print()
 // // results.recall(wanted).print()
+
+//arr=[1,2,3,3,null,[3],2]
+     // arr.uniq().flatten().sum().upto(10).print()

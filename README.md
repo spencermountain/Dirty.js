@@ -6,7 +6,7 @@ extending the javascript built-in prototype issoooogooood
 ###dammit if this doesn't feel good:
 ```javascript
      arr=[1,2,3,3,null,[3]]
-     arr.uniq().flatten().sort().print()
+     arr.uniq().flatten().sum().upto(10).print()
 ```
 
 it's all gonna be fine.
