@@ -19,10 +19,47 @@ var dirty = (function() {
 	fns.arr.collect = fns.arr.grab;
 	fns.arr.transform = fns.arr.grab;
 
+	fns.arr.prepend = Array.prototype.unshift;
+	fns.arr.append = Array.prototype.push;
+
 	fns.arr.clone = function() {
 		return JSON.parse(JSON.stringify(this))
 	}
 	fns.arr.copy = fns.arr.clone;
+
+	fns.arr.stat = function(callback) {
+		var types=this.map(function(v){
+			if(typeof v=="object"){
+				if(v==null){
+					return "null"
+				}else if(v.length){
+					return "array"
+				}
+			}else{
+				return typeof v
+			}
+		}).topk(true)
+		var obj= {
+			length:this.length,
+			types:types.map(function(v){return parseInt(v.percentage) + "% " + v.value+"s"}).join(', '),
+			dupes:this.dupes().topk(true).map(function(v){return [v.value,(v.count+1)]}).to_obj(),
+			falsy:this.length-this.compact().length,
+			empty:this.filter(function(v){
+				if(Object.prototype.toString.call(v)=="[object Array]" && v.length==0){
+					return true
+				}
+				if(Object.prototype.toString.call(v)=="[object Object]" && v.keys.length==0){
+					return true
+				}
+				return false
+			 }).length
+		}
+		if(callback){
+			return callback(obj)
+		}
+		console.log(JSON.stringify(obj, null, 2));
+	}
+	fns.arr.stats = fns.arr.stat;
 
 	//split an array into passes and fails
 	fns.arr.spigot = function(fn) {
@@ -68,7 +105,10 @@ var dirty = (function() {
 		return precisions.average()
 	}
 
-
+	fns.arr.to_tsv = function() {
+		console.log(this.join("\t"))
+	}
+	fns.arr.tsv=fns.arr.to_tsv
 
 	fns.arr.recall = function(wanted) {
 		var results = this;
@@ -277,9 +317,15 @@ var dirty = (function() {
 	fns.arr.uniq_by = fns.arr.uniq
 	fns.arr.unique_by = fns.arr.uniq
 
-	//remove nulls
+	//remove nulls and empties
 	fns.arr.compact = function() {
 		return this.filter(function(v) {
+			if(Object.prototype.toString.call(v)=="[object Array]" && v.length==0){
+				return false
+			}
+			if(Object.prototype.toString.call(v)=="[object Object]" && v.keys.length==0){
+				return false
+			}
 			return v === 0 || v
 		})
 	}
@@ -349,6 +395,7 @@ var dirty = (function() {
 		}
 		return result;
 	};
+	fns.arr.to_obj = fns.arr.toobject
 
 	fns.arr.spotcheck = function(max) {
 		max = max || 10
@@ -442,7 +489,7 @@ var dirty = (function() {
 		for (var i in obj) {
 			this[i] = obj[i];
 		}
-		return obj;
+		return this;
 	};
 	fns.obj.combine = fns.obj.extend;
 	fns.obj.add = fns.obj.extend;
@@ -453,6 +500,25 @@ var dirty = (function() {
 	fns.obj.printf = fns.obj.print
 	fns.obj.log = fns.obj.print
 
+	fns.obj.stats = function() {
+		return this.to_arr().stat()
+	}
+	fns.obj.stat = fns.obj.stats
+
+	fns.obj.sort = function(fn) {
+		fn=fn||function(){}
+		var newobj={}
+		oldobj=this;
+		this.keys().sort(fn).forEach(function(v){
+			newobj[v]=oldobj[v]
+		})
+		return newobj
+	}
+
+	fns.obj.to_tsv = function() {
+		console.log(this.values().join("\t"))
+	}
+	fns.obj.tsv=fns.obj.to_tsv
 
 	/*
 	fns.obj.grab=function(str){
