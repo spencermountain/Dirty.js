@@ -47,7 +47,7 @@ arr = ( (obj={soft:false}) ->
     test: (arr1, objarr) ->
       true
 
-  arr.present =
+  arr.template =
     fn: (fn, join="\n")->
       this.map(fn).join(join)
     alias:["generate","html","to_string","haml"],
