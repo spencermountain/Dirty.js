@@ -66,6 +66,12 @@ Array.extend
     arr= this
     arr[Math.floor(Math.random()*arr.length)]
 
+  has:(f)->
+    this.some(f)
+
+  includes:(f)->
+    this.some(f)
+
 
 Number.extend
   #do something only n person of the time
@@ -77,9 +83,28 @@ Number.extend
       fn1()
     else
       fn2()
+  percent_of:(x)->
+    return 0 if num==0 || x==0
+    num= this/100
+    x * num
   delay:(fn)->
     num= this
     setTimeout(fn,num)
   randomto:(to=100)->
     num= this
     Math.floor(Math.random()*to)+num
+  in:(arr)->
+    num= this
+    arr.some(num)
+  is_in:(arr)->
+    num= this
+    arr.some(num)
+
+
+Object.extend
+  to_a:(obj)->
+    x= []
+    Object.each obj, (k,v)->
+      x.push [k, v]
+    x
+

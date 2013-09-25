@@ -96,6 +96,12 @@ Array.extend({
     var arr;
     arr = this;
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+  has: function(f) {
+    return this.some(f);
+  },
+  includes: function(f) {
+    return this.some(f);
   }
 });
 
@@ -112,6 +118,14 @@ Number.extend({
       return fn2();
     }
   },
+  percent_of: function(x) {
+    var num;
+    if (num === 0 || x === 0) {
+      return 0;
+    }
+    num = this / 100;
+    return x * num;
+  },
   delay: function(fn) {
     var num;
     num = this;
@@ -124,6 +138,27 @@ Number.extend({
     }
     num = this;
     return Math.floor(Math.random() * to) + num;
+  },
+  "in": function(arr) {
+    var num;
+    num = this;
+    return arr.some(num);
+  },
+  is_in: function(arr) {
+    var num;
+    num = this;
+    return arr.some(num);
+  }
+});
+
+Object.extend({
+  to_a: function(obj) {
+    var x;
+    x = [];
+    Object.each(obj, function(k, v) {
+      return x.push([k, v]);
+    });
+    return x;
   }
 });
 
