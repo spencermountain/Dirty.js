@@ -102,6 +102,25 @@ Array.extend({
   },
   includes: function(f) {
     return this.some(f);
+  },
+  not_in: function(arr2) {
+    return this.filter(function(a) {
+      return !arr2.some(a);
+    });
+  },
+  yesmap: function(fn) {
+    return this.map(function(x) {
+      return fn(x);
+    }).compact();
+  },
+  firstmap: function(fn) {
+    var x;
+    x = this.find(function(x) {
+      return fn(x);
+    });
+    if (x) {
+      return fn(x);
+    }
   }
 });
 
@@ -131,6 +150,9 @@ Number.extend({
     num = this;
     return setTimeout(fn, num);
   },
+  random: function() {
+    return Math.floor(Math.random() * this);
+  },
   randomto: function(to) {
     var num;
     if (to == null) {
@@ -148,6 +170,22 @@ Number.extend({
     var num;
     num = this;
     return arr.some(num);
+  },
+  choosenot: function(nay) {
+    var choose, count, upto;
+    count = 0;
+    upto = this;
+    choose = function() {
+      var x;
+      x = Math.floor(Math.random() * upto);
+      if (x === nay && count < 30) {
+        count++;
+        return choose();
+      } else {
+        return x;
+      }
+    };
+    return choose();
   }
 });
 
@@ -159,9 +197,18 @@ Object.extend({
       return x.push([k, v]);
     });
     return x;
+  },
+  combine: function(arr) {
+    var f;
+    f = arr[0];
+    arr.removeAt(0).each(function(obj) {
+      return f = Object.merge(f, obj, false, function(key, a, b) {
+        if (!Array.isArray(a)) {
+          a = [a];
+        }
+        return a.concat(b);
+      });
+    });
+    return f;
   }
 });
-
-/*
-//@ sourceMappingURL=dirty.map
-*/

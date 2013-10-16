@@ -1,13 +1,16 @@
 require("sugar")
 require("./dirty")
 
-obj=
+obja=
+  fun:1,
+  cool:[1,9]
+
+objb=
   fun:3,
   cool:2
 
-arr= [1,2,3,4,5,6]
+objc=
+  fun:"cc",
+  cool:"c"
 
-# console.log arr.has(4)
-x= (4)
-
-console.log x.randomto(5)
+console.log Object.combine([obja,objb, objc])

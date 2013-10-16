@@ -72,6 +72,18 @@ Array.extend
   includes:(f)->
     this.some(f)
 
+  not_in:(arr2)->
+    this.filter (a)->
+      !arr2.some(a)
+
+  yesmap:(fn)->
+    this.map((x)->fn(x)).compact()
+
+  firstmap:(fn)->
+    x= this.find((x)->fn(x))
+    if x
+      return fn(x)
+
 
 Number.extend
   #do something only n person of the time
@@ -90,6 +102,8 @@ Number.extend
   delay:(fn)->
     num= this
     setTimeout(fn,num)
+  random:()->
+    Math.floor(Math.random()*this)
   randomto:(to=100)->
     num= this
     Math.floor(Math.random()*to)+num
@@ -99,6 +113,17 @@ Number.extend
   is_in:(arr)->
     num= this
     arr.some(num)
+  choosenot:(nay)->
+    count= 0
+    upto= this
+    choose=->
+      x= Math.floor(Math.random()*upto)
+      if x==nay && count<30
+        count++
+        choose()
+      else
+        return x
+    choose()
 
 
 Object.extend
@@ -108,3 +133,12 @@ Object.extend
       x.push [k, v]
     x
 
+  #merge two objects, push one into the other when a conflict
+  combine:(arr)->
+    f= arr[0]
+    arr.removeAt(0).each (obj)->
+      f= Object.merge(f, obj, false, (key, a, b)->
+        a= [a] if !Array.isArray a
+        a.concat b
+      )
+    f
