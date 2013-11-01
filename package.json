@@ -1,10 +1,10 @@
 {
-  "name": "dirty",
+  "name": "dirtyjs",
   "version": "1.0.0",
   "description": "do questionable things to the native js objects",
   "keywords": [
     "sugar",
-    "ruby",
+    "ruby"
   ],
   "author": {
     "name": "Spencer Kelly"

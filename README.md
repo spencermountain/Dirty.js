@@ -6,7 +6,7 @@ some plugins for sugar.js:
 it's all gonna be fine.
 
 ```javascript
-    npm install dirty
+    npm install dirtyjs
 ```
 
 ```javascript
