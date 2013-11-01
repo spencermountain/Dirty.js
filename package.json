@@ -1,6 +1,6 @@
 {
   "name": "dirtyjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "do questionable things to the native js objects",
   "keywords": [
     "sugar",
@@ -9,7 +9,7 @@
   "author": {
     "name": "Spencer Kelly"
   },
-  "main": "./coffeejs/index.js",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/spencermountain/dirty.js.git"

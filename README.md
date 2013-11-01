@@ -1,9 +1,9 @@
 you're not supposed to, but...
 ==========================
 
-some plugins for sugar.js:
-
 it's all gonna be fine.
+
+some plugins for [sugarjs.com](sugar.js):
 
 ```javascript
     npm install dirtyjs
@@ -11,6 +11,6 @@ it's all gonna be fine.
 
 ```javascript
      require("dirty")
-     [0...5].overlap([3...8]).print()
-     // [3, 4, 5]
+     x=[1,2,3,4]
+		 console.log(x.random())
 ```
