@@ -65,27 +65,37 @@ Array.extend({
       });
     });
   },
-  topk: function() {
-    var freq, i, length, the, top;
-    the = this;
-    length = the.length || 1;
-    freq = {};
-    i = the.length - 1;
-    while (i > -1) {
-      if (freq[the[i]] == null) {
-        freq[the[i]] = 1;
-      } else {
-        freq[the[i]]++;
-      }
-      i--;
+  topk: function(f) {
+    var arr, neats, obj, top;
+    arr = this;
+    neats = arr;
+    if (f) {
+      neats = arr.map(f);
     }
-    top = Object.keys(freq).sort(function(a, b) {
-      return freq[b] - freq[a];
+    obj = neats.reduce(function(h, r) {
+      if (typeof r === "object") {
+        r = JSON.stringify(r);
+      }
+      if (!h[r]) {
+        h[r] = 0;
+      }
+      h[r]++;
+      return h;
+    }, {});
+    top = Object.keys(obj).sort(function(a, b) {
+      return obj[b] - obj[a];
     });
     return top.map(function(v) {
+      var original;
+      original = v;
+      if (f) {
+        original = arr.find(function(a) {
+          return JSON.stringify(a[f]) === JSON.stringify(v);
+        });
+      }
       return {
-        value: v,
-        count: freq[v]
+        value: original,
+        count: obj[v]
       };
     });
   },
@@ -121,6 +131,27 @@ Array.extend({
     if (x) {
       return fn(x);
     }
+  },
+  equals: function(b) {
+    var a, i;
+    a = this;
+    if (a === b) {
+      return true;
+    }
+    if ((a == null) || (b == null)) {
+      return false;
+    }
+    if (a.length !== b.length) {
+      return false;
+    }
+    i = 0;
+    while (i < a.length) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+      ++i;
+    }
+    return true;
   }
 });
 

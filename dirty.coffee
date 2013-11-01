@@ -44,20 +44,26 @@ Array.extend
         arr2.some (v2) ->
           v is v2
 
-  topk:()->
-      the = this
-      length = the.length or 1
-      freq = {}
-      i = the.length - 1
-      while i > -1
-        (if !freq[the[i]]? then freq[the[i]] = 1 else freq[the[i]]++)
-        i--
-      top = Object.keys(freq).sort((a, b) ->
-        freq[b] - freq[a]
-      )
-      top.map (v) ->
-        value: v
-        count: freq[v]
+  topk:(f)->
+    arr= this
+    neats= arr
+    if f
+      neats= arr.map(f)
+    obj= neats.reduce( (h,r)->
+      r= JSON.stringify(r) if typeof r =="object"
+      h[r] = 0 if !h[r]
+      h[r]++
+      h
+    , {})
+    top = Object.keys(obj).sort((a, b) ->
+      obj[b] - obj[a]
+    )
+    top.map (v) ->
+      original= v
+      if f
+        original= arr.find (a)-> JSON.stringify(a[f])==JSON.stringify(v)
+      value: original
+      count: obj[v]
 
   print:()->
       console.log JSON.stringify(this, null, 2)
@@ -83,6 +89,19 @@ Array.extend
     x= this.find((x)->fn(x))
     if x
       return fn(x)
+
+  equals:(b)->
+    a= this
+    return true  if a is b
+    return false  if not a? or not b?
+    return false  unless a.length is b.length
+    # If you don't care about the order of the elements inside the array, you should sort both arrays here.
+    i = 0
+    while i < a.length
+      return false  if a[i] isnt b[i]
+      ++i
+    true
+
 
 
 Number.extend
@@ -133,7 +152,7 @@ Object.extend
       x.push [k, v]
     x
 
-  #merge two objects, push one into the other when a conflict
+  #merge an array of objects, push one into the other when a conflict
   combine:(arr)->
     f= arr[0]
     arr.removeAt(0).each (obj)->
