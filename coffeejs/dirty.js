@@ -152,6 +152,20 @@ Array.extend({
       ++i;
     }
     return true;
+  },
+  prefer: function(fn) {
+    var a, arr, obj;
+    arr = this;
+    obj = arr.spigot(fn);
+    a = obj["true"] || [];
+    return a.concat(obj["false"]);
+  },
+  bury: function(fn) {
+    var a, arr, obj;
+    arr = this;
+    obj = arr.spigot(fn);
+    a = obj["false"] || [];
+    return a.concat(obj["true"]);
   }
 });
 

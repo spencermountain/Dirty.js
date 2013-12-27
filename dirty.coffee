@@ -102,6 +102,17 @@ Array.extend
       ++i
     true
 
+  prefer:(fn)->
+    arr= this
+    obj= arr.spigot fn
+    a= obj.true||[]
+    a.concat(obj.false)
+
+  bury:(fn)->
+    arr= this
+    obj= arr.spigot fn
+    a= obj.false||[]
+    a.concat(obj.true)
 
 
 Number.extend
