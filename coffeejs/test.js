@@ -7,6 +7,4 @@ require("./dirty");
 
 arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-console.log(arr.prefer(function(x) {
-  return x === 0;
-}));
+console.log(arr.overlaps([99]));

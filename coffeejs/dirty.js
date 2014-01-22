@@ -65,6 +65,13 @@ Array.extend({
       });
     });
   },
+  overlaps: function(arr2) {
+    return this.some(function(v) {
+      return arr2.some(function(v2) {
+        return v === v2;
+      });
+    });
+  },
   topk: function(f) {
     var arr, neats, obj, top;
     arr = this;

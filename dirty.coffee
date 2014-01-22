@@ -44,6 +44,11 @@ Array.extend
         arr2.some (v2) ->
           v is v2
 
+  overlaps:(arr2) ->
+      this.some (v) ->
+        arr2.some (v2) ->
+          v is v2
+
   topk:(f)->
     arr= this
     neats= arr
