@@ -1,20 +1,20 @@
 {
-  "name": "dirtyjs",
-  "version": "1.0.3",
-  "description": "do questionable things to the native js objects",
-  "keywords": [
-    "sugar",
-    "ruby"
-  ],
-  "author": {
-    "name": "Spencer Kelly"
-  },
-  "main": "./index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/spencermountain/dirty.js.git"
-  },
-  "engines": {
-    "node": ">= 0.4.0"
-  }
+    "name": "dirtyjs",
+    "version": "1.0.5",
+    "description": "do questionable things to the native js objects",
+    "keywords": [
+        "sugar",
+        "ruby"
+    ],
+    "author": {
+        "name": "Spencer Kelly"
+    },
+    "main": "./index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/spencermountain/dirty.js.git"
+    },
+    "engines": {
+        "node": ">= 0.4.0"
+    }
 }

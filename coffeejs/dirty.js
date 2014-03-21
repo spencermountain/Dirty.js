@@ -238,6 +238,30 @@ Number.extend({
       }
     };
     return choose();
+  },
+  under: function(i) {
+    var num;
+    num = parseInt(this);
+    if (num > i) {
+      return i;
+    } else {
+      return num;
+    }
+  },
+  below: function(i) {
+    return this.under(i);
+  },
+  atleast: function(i) {
+    var num;
+    num = parseInt(this);
+    if (num < i) {
+      return i;
+    } else {
+      return num;
+    }
+  },
+  above: function(i) {
+    return this.atleast(i);
   }
 });
 

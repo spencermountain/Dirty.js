@@ -159,7 +159,23 @@ Number.extend
       else
         return x
     choose()
+  under:(i)->
+    num= parseInt(this)
+    if num > i
+      return i
+    else
+      return num
+  below:(i)->
+    return this.under(i)
 
+  atleast:(i)->
+    num= parseInt(this)
+    if num < i
+      return i
+    else
+      return num
+  above:(i)->
+    return this.atleast(i)
 
 Object.extend
   to_a:(obj)->
