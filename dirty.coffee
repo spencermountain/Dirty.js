@@ -70,6 +70,14 @@ Array.extend
       value: original
       count: obj[v]
 
+  topkp:(f)->
+    arr= this
+    count= arr.length || 0
+    return arr.topk(f).map (t)->
+      t.percent= ((t.count/count)*100).toFixed(2);
+      t
+
+
   print:()->
       console.log JSON.stringify(this, null, 2)
 

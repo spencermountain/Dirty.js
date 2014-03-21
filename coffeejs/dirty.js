@@ -106,6 +106,15 @@ Array.extend({
       };
     });
   },
+  topkp: function(f) {
+    var arr, count;
+    arr = this;
+    count = arr.length || 0;
+    return arr.topk(f).map(function(t) {
+      t.percent = ((t.count / count) * 100).toFixed(2);
+      return t;
+    });
+  },
   print: function() {
     return console.log(JSON.stringify(this, null, 2));
   },

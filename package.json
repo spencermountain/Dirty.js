@@ -1,6 +1,6 @@
 {
     "name": "dirtyjs",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "do questionable things to the native js objects",
     "keywords": [
         "sugar",
