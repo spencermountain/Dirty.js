@@ -28,6 +28,9 @@ Array.extend
           all["false"].push v
       all
 
+  moses:(fn) ->
+    the.spigot(fn)
+
   duplicates:(field) ->
       the = this
       the = the.grab(field)  if field
@@ -191,6 +194,24 @@ Object.extend
     Object.each obj, (k,v)->
       x.push [k, v]
     x
+
+  #find the strongest correllations between a key and its values
+  signals:(o)->
+    better= {}
+    Object.keys(o).forEach (k)->
+      arr= o[k].topkp()
+      better[k]=arr
+
+    best= []
+    Object.keys(better).forEach (k)->
+      better[k].forEach (combo)->
+        confidence= combo.percent * combo.count
+        best.push({key:k, value:combo.value, count:combo.count,  percent:combo.percent, confidence:confidence})
+    best= best.sort (a,b)->
+      return b.confidence - a.confidence
+    best= best.unique('key')
+    return best
+
 
   #merge an array of objects, push one into the other when a conflict
   combine:(arr)->

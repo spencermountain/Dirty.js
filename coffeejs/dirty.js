@@ -41,6 +41,9 @@ Array.extend({
     });
     return all;
   },
+  moses: function(fn) {
+    return the.spigot(fn);
+  },
   duplicates: function(field) {
     var i, results, the;
     the = this;
@@ -282,6 +285,34 @@ Object.extend({
       return x.push([k, v]);
     });
     return x;
+  },
+  signals: function(o) {
+    var best, better;
+    better = {};
+    Object.keys(o).forEach(function(k) {
+      var arr;
+      arr = o[k].topkp();
+      return better[k] = arr;
+    });
+    best = [];
+    Object.keys(better).forEach(function(k) {
+      return better[k].forEach(function(combo) {
+        var confidence;
+        confidence = combo.percent * combo.count;
+        return best.push({
+          key: k,
+          value: combo.value,
+          count: combo.count,
+          percent: combo.percent,
+          confidence: confidence
+        });
+      });
+    });
+    best = best.sort(function(a, b) {
+      return b.confidence - a.confidence;
+    });
+    best = best.unique('key');
+    return best;
   },
   combine: function(arr) {
     var f;
