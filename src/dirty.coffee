@@ -101,6 +101,15 @@ Array.extend
   yesmap:(fn)->
     this.map((x)->fn(x)).compact()
 
+  hasmap:(fn)->
+    arr= this
+    if fn
+      arr= arr.map(fn)
+    return arr.reduce((h,o)->
+      h[o]=true
+      h
+    ,{})
+
   firstmap:(fn)->
     x= this.find((x)->fn(x))
     if x

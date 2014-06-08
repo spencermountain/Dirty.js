@@ -14,7 +14,10 @@ obj= {
   mixed:['yes', 'no'],
   mixed2:['yes','yes', 'no','no'],
 }
-console.log Object.signals(obj)
+# console.log Object.signals(obj)
+
+arr= ['yes','fun','cool']
+console.log(arr.hasmap())
 
 
 # x= 6

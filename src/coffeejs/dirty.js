@@ -142,6 +142,17 @@ Array.extend({
       return fn(x);
     }).compact();
   },
+  hasmap: function(fn) {
+    var arr;
+    arr = this;
+    if (fn) {
+      arr = arr.map(fn);
+    }
+    return arr.reduce(function(h, o) {
+      h[o] = true;
+      return h;
+    }, {});
+  },
   firstmap: function(fn) {
     var x;
     x = this.find(function(x) {
