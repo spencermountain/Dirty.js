@@ -3,16 +3,15 @@ you're not supposed to, but...
 
 it's all gonna be fine.
 
-some plugins for [sugarjs.com](sugar.js):
-
 ```javascript
     npm install dirtyjs
 ```
 
 ```javascript
      require("dirty")
-     x=[1,2,3,4]
-		 console.log(x.random())
+     x=[1,2,2,3]
+		 console.log(x.uniq())
+     //[1,2,3]
 ```
 
 ### Salacious Methods of questionable value
@@ -35,14 +34,4 @@ Array.topkp(f)
 Array.random()
 //choose one from array randomly
 
-
-
-Number.percent(fn)
-// do the function x percent of the time
-
-Number.atleast(y)
-//ensure x is >= y
-
-Number.below(y)
-//ensure x is < y
 ```
