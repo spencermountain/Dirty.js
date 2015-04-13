@@ -1,8 +1,6 @@
 you're not supposed to, but...
 ==========================
 
-dirtyjs appends methods on the native array prototype
-
 it's all gonna be fine.
 
 ```javascript
@@ -10,18 +8,17 @@ npm install dirtyjs
 ```
 ```javascript
 require("dirty")
-console.log([1,2,2,3].uniq())
+[1,2,2,3].uniq()
 //[1,2,3]
 ```
 
 or in the browser:
-````
+````javascript
 <script src="https://rawgit.com/spencermountain/Dirty.js/master/build/dirty.min.js"></script>
 <script>
-  console.log([1,2,3].sum())
+  [1,2,3].sum()
   // 6
 </script>
-
 ````
 
 ### Salacious Methods of questionable value
