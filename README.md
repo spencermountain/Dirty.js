@@ -5,21 +5,28 @@ dirtyjs appends methods on the native array prototype
 
 it's all gonna be fine.
 
-
 ```javascript
-    npm install dirtyjs
+npm install dirtyjs
+```
+```javascript
+require("dirty")
+console.log([1,2,2,3].uniq())
+//[1,2,3]
 ```
 
-```javascript
-     require("dirty")
-		 console.log([1,2,2,3].uniq())
-     //[1,2,3]
-```
+or in the browser:
+````
+<script src="https://rawgit.com/spencermountain/Dirty.js/master/build/dirty.min.js"></script>
+<script>
+  console.log([1,2,3].sum())
+  // 6
+</script>
+
+````
 
 ### Salacious Methods of questionable value
 ```javascript
   var arr=[1,2,2,3]
-
   arr.topk()
   //[{"value":"2","count":2},{"value":"1","count":1},{"value":"3","count":1}]
   arr.topkp()
