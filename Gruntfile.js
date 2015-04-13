@@ -10,8 +10,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
-          './src/sugar.js',
-          './src/coffeejs/dirty.js',
+          './dirty.js'
         ],
         dest: './build/dirty.js'
       }

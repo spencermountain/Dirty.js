@@ -1,6 +1,3 @@
-/*! dirtyjs 
- by @spencermountain
- 2015-04-12 */
 (function() {
 
     var arr = {
