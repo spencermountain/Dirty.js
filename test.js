@@ -12,9 +12,17 @@ exports["array tests"] = function(test){
   test.deepEqual(arr.uniq(), [1,2,3])
   test.deepEqual(arr.includes(2), true)
   test.deepEqual(arr.includes(20), false)
+  test.deepEqual(arr.shuffle().length, arr.length)
+  test.deepEqual(arr.sum(), 8)
+  test.deepEqual(arr.average(), 2)
+
+  test.deepEqual([1, [2], 3].flatten(), [1,2,3])
+  test.deepEqual([1, 2, null, 3].compact(), [1,2,3])
+  test.deepEqual([1, 1, 1].random(), 1)
 
   var arr=[{id:1}, {id:2}, {id:2}, {id:3}]
   test.deepEqual(arr.uniq('id'), [{"id":1},{"id":2},{"id":3}])
   test.deepEqual(arr.pluck('id'), [1,2,2,3])
+  test.deepEqual(arr.average('id'), 2)
   test.done()
 }
