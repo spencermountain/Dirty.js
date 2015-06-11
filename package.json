@@ -1,12 +1,12 @@
 {
     "name": "dirtyjs",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "description": "do questionable things to the native js objects",
     "keywords": [
         "sugar"
     ],
     "author": "Spencer Kelly <spencermountain@gmail.com> (http://spencermounta.in)",
-    "main": "./dirtyjs.js",
+    "main": "./dirty.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/spencermountain/dirty.js.git"
